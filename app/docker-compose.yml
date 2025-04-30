@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_URL=postgres://user:password@db:8080/itbookworm?sslmode=disable
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: itbookworm
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
