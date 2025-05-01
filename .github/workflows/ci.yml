@@ -1,27 +1,38 @@
+name: Go Tests
+
 on:
   push:
     branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
     
-stages:
-  - test
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: itbookworm_test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-variables:
-  POSTGRES_DB: itbookworm_test
-  POSTGRES_USER: testuser
-  POSTGRES_PASSWORD: testpassword
-  DB_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB?sslmode=disable"
-
-
-test-job:
-  stage: test
-  image: golang:1.22
-  services:
-    - name: postgres:15
-      alias: postgres
-      variables:
-        POSTGRES_DB: $POSTGRES_DB
-        POSTGRES_USER: $POSTGRES_USER
-        POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-  script:
-    - go test -v -coverprofile=coverage.out ./...
-    - go tool cover -func=coverage.out
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+      
+      - name: Run tests
+        env:
+          DB_URL: "postgres://testuser:testpassword@localhost:5432/itbookworm_test?sslmode=disable"
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out
