@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
+	"syscall"
 
 	_ "github.com/lib/pq"
 )
