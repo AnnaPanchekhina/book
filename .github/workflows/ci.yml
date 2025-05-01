@@ -1,11 +1,11 @@
-name: Go CI
+name: Go CI Pipeline
 
 on:
   push:
     branches: [ main ]
 
 env:
-  GO_VERSION: 1.22
+  GO_VERSION: '1.22'
   POSTGRES_DB: itbookworm_test
   POSTGRES_USER: testuser
   POSTGRES_PASSWORD: testpassword
@@ -13,6 +13,18 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    script:
-      - cd ./../app/
-      - make test 
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: 'app'  
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run unit tests
+        working-directory: ./app  
+        run: make test
