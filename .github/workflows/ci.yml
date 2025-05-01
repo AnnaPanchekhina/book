@@ -1,8 +1,14 @@
-name: Go Tests
+name: Go CI
 
 on:
   push:
     branches: [ main ]
+
+env:
+  GO_VERSION: 1.22
+  POSTGRES_DB: itbookworm_test
+  POSTGRES_USER: testuser
+  POSTGRES_PASSWORD: testpassword
 
 jobs:
   test:
@@ -12,9 +18,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: itbookworm_test
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready
@@ -23,16 +29,19 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22'
-      
-      - name: Run tests
-        env:
-          DB_URL: "postgres://testuser:testpassword@localhost:5432/itbookworm_test?sslmode=disable"
-        run: |
-          go test -v -coverprofile=coverage.out ./...
-          go tool cover -func=coverage.out
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    
+    - name: Generate go.sum
+      run: go mod tidy
+    
+    - name: Run tests
+      env:
+        DB_URL: "postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}?sslmode=disable"
+      run: |
+        go test -v -coverprofile=coverage.out ./...
+        go tool cover -func=coverage.out
