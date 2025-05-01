@@ -1,4 +1,4 @@
-.PHONY: build run clean
+.PHONY: build test run clean
 
 APP_NAME := itbookworm
 DB_URL := postgres://user:password@localhost:5432/itbookworm?sslmode=disable
@@ -22,3 +22,5 @@ docker-down:
 docker-migrate-up:
 	docker-compose exec app migrate -path $(MIGRATIONS_DIR) -database "$$DB_URL" up
 
+test:
+	go test -v -short ./internal/models/...
