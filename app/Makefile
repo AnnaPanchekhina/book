@@ -1,4 +1,4 @@
-.PHONY: build test run clean
+.PHONY: build test unit-test integration-test run clean
 
 APP_NAME := itbookworm
 DB_URL := postgres://user:password@localhost:5432/itbookworm?sslmode=disable
@@ -22,5 +22,12 @@ docker-down:
 docker-migrate-up:
 	docker-compose exec app migrate -path $(MIGRATIONS_DIR) -database "$$DB_URL" up
 
-test:
-	go test -v -short ./internal/models/...
+test: unit-test integration-test
+
+unit-test:
+	@echo "Running unit tests..."
+	go test -v -short ./...
+
+integration-test:
+	@echo "Running integration tests..."
+	go test -v -tags=integration ./...
