@@ -1,12 +1,18 @@
+version: '3.8'
+
+volumes:
+  postgres_data:  
+
 services:
   app:
     build: .
     ports:
       - "4000:4000"
     environment:
-      - DB_URL=postgres://user:password@db:8080/itbookworm?sslmode=disable
+      - DB_URL=postgres://user:password@db:5432/itbookworm?sslmode=disable
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:15
@@ -15,9 +21,9 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: itbookworm
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "8080:8080"
-
-volumes:
-  postgres_data:
+      - postgres_data:/var/lib/postgresql/data  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d itbookworm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
