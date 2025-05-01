@@ -1,0 +1,24 @@
+stages:
+  - test
+
+variables:
+  POSTGRES_DB: itbookworm_test
+  POSTGRES_USER: testuser
+  POSTGRES_PASSWORD: testpassword
+  DB_URL: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB?sslmode=disable"
+
+
+test-job:
+  stage: test
+  image: golang:1.22
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: $POSTGRES_DB
+        POSTGRES_USER: $POSTGRES_USER
+        POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  script:
+    - go test -v -coverprofile=coverage.out ./...
+    - go tool cover -func=coverage.out
+

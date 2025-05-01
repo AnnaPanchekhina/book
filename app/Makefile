@@ -8,9 +8,7 @@ build:
 	go build -o bin/$(APP_NAME) ./cmd/api
 
 run:
-	go build -o bin/itbookworm ./cmd/api
 	DB_URL="postgres://user:password@localhost:5432/itbookworm?sslmode=disable" ./bin/itbookworm
-
 
 clean:
 	rm -rf bin/
