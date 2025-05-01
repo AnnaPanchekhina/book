@@ -1,9 +1,6 @@
 package models
 
-import (
-	"testing"
-	"time"
-)
+import "testing"
 
 func TestBookValidation(t *testing.T) {
 	tests := []struct {
@@ -19,6 +16,11 @@ func TestBookValidation(t *testing.T) {
 		{
 			name:    "Empty Title",
 			book:    Book{Title: "", Author: "Author"},
+			wantErr: true,
+		},
+		{
+			name:    "Empty Author",
+			book:    Book{Title: "Title", Author: ""},
 			wantErr: true,
 		},
 	}
