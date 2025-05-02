@@ -24,19 +24,20 @@ jobs:
         run: make lint
 
   sonarqube:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: SonarQube Scan
-          uses: SonarSource/sonarqube-scan-action@master
-          env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          with:
-            args: >
-              -Dsonar.projectKey=AnnaPanchekhina_book
-              -Dsonar.organization=annapanchekhina
-              -Dsonar.projectName="Book Project"
-              -Dsonar.sources=.
-              -Dsonar.exclusions=**/*_test.go
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=AnnaPanchekhina_book
+            -Dsonar.organization=annapanchekhina
+            -Dsonar.projectName="Book Project"
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/*_test.go
