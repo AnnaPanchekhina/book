@@ -24,17 +24,15 @@ jobs:
         run: make lint
 
   sonarqube:
-    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-
-      - name: SonarQube
+      - uses: actions/checkout@v4
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=AnnaPanchekhina_book 
+            -Dsonar.organization=annapanchekhina
