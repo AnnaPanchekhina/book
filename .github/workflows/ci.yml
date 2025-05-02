@@ -13,7 +13,7 @@ jobs:
         working-directory: ./app  
         run: make test
   lint:
-  needs: [test]
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
