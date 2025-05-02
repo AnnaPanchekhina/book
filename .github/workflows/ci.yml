@@ -2,6 +2,9 @@ name: CI Pipeline
 
 on: push
 
+env:
+  DOCKER_IMAGE: ghcr.io/annapanchekhina/book
+
 jobs:
   test:
     runs-on: ubuntu-latest
