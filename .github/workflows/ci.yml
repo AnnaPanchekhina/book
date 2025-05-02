@@ -23,18 +23,18 @@ jobs:
         working-directory: ./app  
         run: make lint
 
-    sonarqube:
-      needs: [test, lint]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+  sonarqube:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Set up Go
-          uses: actions/setup-go@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
 
-        - name: SonarQube
-          uses: SonarSource/sonarqube-scan-action@master
-          env:
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarQube
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
