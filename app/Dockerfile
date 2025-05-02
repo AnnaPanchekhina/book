@@ -3,15 +3,12 @@ FROM golang:1.22.2-alpine AS builder
 WORKDIR /app
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /itbookworm ./cmd/api
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -o /book ./cmd/api
 
-FROM alpine:3.18
-
-WORKDIR /app
-
-FROM alpine:3.18
-WORKDIR /app
-COPY --from=builder /itbookworm .
+FROM alpine:latest
+WORKDIR /root/
+COPY --from=builder /book .
 COPY --from=builder /app/migrations ./migrations
 EXPOSE 4000
-CMD ["/app/itbookworm"]
+CMD ["./book"]
