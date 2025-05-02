@@ -31,3 +31,9 @@ unit-test:
 integration-test:
 	@echo "Running integration tests..."
 	go test -v -tags=integration ./...
+
+lint:
+	@echo "Installing golangci-lint..."
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+	@echo "Running lint..."
+	$$(go env GOPATH)/bin/golangci-lint run ./... --timeout 5m

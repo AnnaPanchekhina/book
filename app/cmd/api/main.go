@@ -32,43 +32,30 @@ type application struct {
 }
 
 func main() {
-	var cfg config
+    var cfg config
+    flag.IntVar(&cfg.port, "port", 4000, "API server port")
+    flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
+    flag.StringVar(&cfg.db.dsn, "db-dsn", "postgres://user:password@db:5432/itbookworm?sslmode=disable", "PostgreSQL DSN")
+    flag.Parse()
 
-	flag.IntVar(&cfg.port, "port", 4000, "API server port")
-	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", "postgres://user:password@db:5432/itbookworm?sslmode=disable", "PostgreSQL DSN")
-	flag.Parse()
+    logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+    // Подключение к PostgreSQL
+    db, err := openDB(cfg)
+    if err != nil {
+        logger.Fatal(err)
+    }
+    defer func() {
+        if err := db.Close(); err != nil {
+            logger.Printf("error closing database connection: %v", err)
+        }
+    }()
 
-	// Подключение к PostgreSQL с ретраями
-	var db *sql.DB
-	var err error
-
-	for i := 0; i < 10; i++ {
-		db, err = sql.Open("postgres", cfg.db.dsn)
-		if err == nil {
-			err = db.Ping()
-			if err == nil {
-				break
-			}
-		}
-		logger.Printf("Waiting for database... (attempt %d/10)", i+1)
-		time.Sleep(5 * time.Second)
-	}
-
-	if err != nil {
-		logger.Fatal("Failed to connect to database after retries:", err)
-	}
-	defer db.Close()
-
-	logger.Println("Database connection pool established")
-
-	app := &application{
-		config: cfg,
-		logger: logger,
-		db:     db,
-	}
+    app := &application{
+        config: cfg,
+        logger: logger,
+        db:     db,
+    }
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
@@ -112,4 +99,21 @@ func main() {
 	}
 
 	logger.Println("Server stopped")
+}
+
+func openDB(cfg config) (*sql.DB, error) {
+    db, err := sql.Open("postgres", cfg.db.dsn)
+    if err != nil {
+        return nil, err
+    }
+    
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+    
+    err = db.PingContext(ctx)
+    if err != nil {
+        return nil, err
+    }
+    
+    return db, nil
 }
