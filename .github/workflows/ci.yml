@@ -84,6 +84,14 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
 
+      - name: Test SSH connection
+        run: |
+          ssh -v -p ${{ secrets.SSH_PORT }} \
+              -o ConnectTimeout=5 \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              "echo 'SSH успешно подключен!'"
+
       - name: Deploy to server
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
