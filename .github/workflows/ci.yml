@@ -13,3 +13,13 @@ jobs:
       - name: Run unit tests
         working-directory: ./app  
         run: make test
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint
+        working-directory: ./app  
+        run: make lint
