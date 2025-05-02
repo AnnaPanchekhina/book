@@ -43,6 +43,7 @@ jobs:
             -Dsonar.exclusions=**/*_test.go
 
   deploy:
+#    needs: [sonarqube]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -54,25 +55,25 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.DOCKER_IMAGE }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
             type=sha
-            
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKER_IMAGE }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
-
+          
       - name: Install SSH key
         uses: webfactory/ssh-agent@v0.8.0
         with:
@@ -80,8 +81,8 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -p $SSH_PORT $SSH_USER@$SSH_HOST "
-            docker pull $DOCKER_IMAGE && \
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            docker pull ${{ env.DOCKER_IMAGE }}:latest && \
             docker stop book-api || true && \
             docker rm book-api || true && \
             docker run -d \
@@ -89,5 +90,5 @@ jobs:
               --restart always \
               -p 4000:4000 \
               -e DB_DSN=${{ secrets.DB_DSN }} \
-              $DOCKER_IMAGE
-          "          
+              ${{ env.DOCKER_IMAGE }}:latest
+          "
