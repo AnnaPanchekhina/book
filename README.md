@@ -1,7 +1,7 @@
 # Документация и отказоустойчивость 
 
 **Скриншот работающего API**
-[!Скриншот работающего API](/images/image.png)
+[Скриншот работающего API](/images/image.png)
 
 **Ссылка на успешный запуск пайплайна в CI/CD** 
 https://github.com/AnnaPanchekhina/book/actions/runs/14802306105
@@ -34,7 +34,7 @@ https://github.com/AnnaPanchekhina/book/actions/runs/14802306105
 
 ## Примеры запросов к API
 
-[!curl http://localhost:4000/v1/healthcheck](/images/curl.png)
+[http://localhost:4000/v1/healthcheck](/images/curl.png)
 
 
 **В случае, если приложение не подключается к БД:**
