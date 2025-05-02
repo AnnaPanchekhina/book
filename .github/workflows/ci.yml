@@ -1,14 +1,6 @@
-name: Go CI Pipeline
+name: CI Pipeline
 
-on:
-  push:
-    branches: [ main ]
-
-env:
-  GO_VERSION: '1.22'
-  POSTGRES_DB: itbookworm_test
-  POSTGRES_USER: testuser
-  POSTGRES_PASSWORD: testpassword
+on: push
 
 jobs:
   test:
@@ -17,13 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          path: 'app'  
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
+      - name: Install deps
+        run: nmp ci
 
       - name: Run unit tests
         working-directory: ./app  
