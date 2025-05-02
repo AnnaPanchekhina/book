@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install deps
-        run: nmp ci
 
       - name: Run unit tests
         working-directory: ./app  
