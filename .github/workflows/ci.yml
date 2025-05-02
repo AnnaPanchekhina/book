@@ -46,6 +46,7 @@ jobs:
             -Dsonar.exclusions=**/*_test.go
 
   deploy:
+    needs: [test, lint, sonarqube]
     runs-on: ubuntu-latest
     permissions:
       contents: read
